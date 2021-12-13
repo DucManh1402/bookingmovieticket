@@ -29,6 +29,7 @@ export default function SapChieu({ movies }) {
   const handleRedirect = (movie) => {
     setMovieDetail(movie);
     localStorage.setItem('movieDetail', JSON.stringify(movie));
+    localStorage.setItem('dangChieu', JSON.stringify(false));
     Router.push('/moviedetail');
   }
 

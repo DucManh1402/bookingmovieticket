@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Layout, Menu, Input, Button, Dropdown, message } from "antd";
 import { SearchOutlined, SettingOutlined } from "@ant-design/icons";
 import { useRecoilState } from "recoil";
-
+import FooterWeb from "./footer";
 
 import { userState } from "../store/userState";
 import apiService from "../utils/api/apiService";
@@ -43,6 +43,12 @@ export default function DefaultLayout({ children }) {
     }
   }
 
+  const handleRedirect = (user) => {
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    Router.push('/userdetail');
+  }
+
   const menu = (
     <Menu onClick={({ key: tab }) => handleChangeTab(tab)} inlineCollapsed="false">
       <Menu.Item key="0" disabled>
@@ -54,7 +60,7 @@ export default function DefaultLayout({ children }) {
       <Menu.Item key="1">
         <a>Xem hóa đơn</a>
       </Menu.Item>
-      <Menu.Item key="2">
+      <Menu.Item key="2"  onClick={() => handleRedirect(user)}>
         <a>Sửa thông tin</a>
       </Menu.Item>
       <Menu.Divider />
@@ -125,7 +131,12 @@ export default function DefaultLayout({ children }) {
           </div>
         </div>
       </Content>
-      <Footer>Footer</Footer>
+      <Footer>
+        <FooterWeb/>
+        <div className="pt-20 text-center">
+        ©Trang web của project Movies
+        </div>
+      </Footer>
     </Layout>
   );
 }

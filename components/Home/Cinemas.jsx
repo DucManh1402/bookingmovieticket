@@ -1,11 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { Tabs } from "antd";
+import apiService from "../../utils/api/apiService";
 
 const { TabPane } = Tabs;
 export default function Cinemas() {
+  const [tab, setTab] = useState("Galaxy");
+  const [cinemas, setCinemas] = useState([]);
+  const [tab1, setTab1] = useState("");
+  const [showtimes, setShowtimes] = useState([]);
+
+  const getCinemas = async () => {
+
+    const response = await apiService.get("/cinemas/getAllCinemas");
+    setCinemas(response.data);
+    // console.log(response.data);
+  };
+  const getShowtimes = async () => {
+
+    const response = await apiService.get("/showtimes");
+    setShowtimes(response.data);
+    console.log(response.data);
+  };
+
+  const handleChangeTab = (key) => {
+    setTab(key);
+  }
+  const handleChangeTab1 = (key) => {
+    setTab1(key);
+  }
+  useEffect(() => {
+    getCinemas();
+    getShowtimes();
+  }, []);
+
   return (
     <>
-      <Tabs defaultActiveKey="1" type="card">
+      <Tabs defaultActiveKey={tab} type="card" centered onChange={handleChangeTab}>
         <TabPane
           tab={
             <div
@@ -13,89 +43,12 @@ export default function Cinemas() {
               style={{
                 width: 60,
                 height: 60,
-                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2018/09/f32670fd0eb083c9c4c804f0f3a252ed.png)`,
+                backgroundImage: `url(https://assets.glxplay.io/images/plain/categories/1000x1000.png)`,
               }}
             ></div>
           }
-          key="1"
+          key="Galaxy"
         >
-          <Tabs tabPosition="left">
-            <TabPane
-              tab={
-                <div className=" flex font-sans">
-                  <div
-                    className=" bg-cover"
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundImage: `url(https://s3img.vcdn.vn/123phim/2021/01/bhd-star-bitexco-16105952137769.png)`,
-                    }}
-                  ></div>
-                  <div className="pl-5 flex-col">
-                    <div className="text-sm font-medium">
-                      BHD Star - Bitexco
-                    </div>
-                    <div className="text-sm">
-                      L3-Bitexco Icon 68, 2 Hải Triều, Q.1
-                    </div>
-                  </div>
-                </div>
-              }
-              key="1"
-            >
-              Không có xuất chiếu
-            </TabPane>
-            <TabPane
-              tab={
-                <div className=" flex font-sans">
-                  <div
-                    className=" bg-cover"
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundImage: `url(https://s3img.vcdn.vn/123phim/2021/01/bhd-star-bitexco-16105952137769.png)`,
-                    }}
-                  ></div>
-                  <div className="pl-5 flex-col">
-                    <div className="text-sm font-medium">
-                      BHD Star - Vincom Thảo Điền
-                    </div>
-                    <div className="text-sm">
-                      L5-Megamall, 159 XL Hà Nội, Q.2
-                    </div>
-                  </div>
-                </div>
-              }
-              key="2"
-            >
-              Content of Tab 2
-            </TabPane>
-            <TabPane
-              tab={
-                <div className=" flex font-sans">
-                  <div
-                    className=" bg-cover"
-                    style={{
-                      width: 60,
-                      height: 60,
-                      backgroundImage: `url(https://s3img.vcdn.vn/123phim/2021/01/bhd-star-bitexco-16105952137769.png)`,
-                    }}
-                  ></div>
-                  <div className="pl-5 flex-col">
-                    <div className="text-sm font-medium">
-                      BHD Star Vincom 3/2
-                    </div>
-                    <div className="text-sm">
-                      L5-Vincom 3/2, 3C Đường 3/2, Q.10
-                    </div>
-                  </div>
-                </div>
-              }
-              key="3"
-            >
-              Content of Tab 3
-            </TabPane>
-          </Tabs>
         </TabPane>
         <TabPane
           tab={
@@ -104,11 +57,11 @@ export default function Cinemas() {
               style={{
                 width: 60,
                 height: 60,
-                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2018/09/1721cfa98768f300c03792e25ceb0191.png)`,
+                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2018/09/404b8c4b80d77732e7426cdb7e24be20.png)`,
               }}
             ></div>
           }
-          key="2"
+          key="Lotte"
         ></TabPane>
         <TabPane
           tab={
@@ -117,11 +70,11 @@ export default function Cinemas() {
               style={{
                 width: 60,
                 height: 60,
-                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2021/01/77807d96b5048f1d79f45d9d7d3f6a3a.png)`,
+                backgroundImage: `url(https://gigamall.com.vn/data/2019/05/06/11365490_logo-cgv-500x500.jpg)`,
               }}
             ></div>
           }
-          key="3"
+          key="CGV"
         ></TabPane>
         <TabPane
           tab={
@@ -130,13 +83,76 @@ export default function Cinemas() {
               style={{
                 width: 60,
                 height: 60,
-                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2018/09/9b240f96a233bb43203ee514a21a6004.png)`,
+                backgroundImage: `url(https://s3img.vcdn.vn/123phim/2021/11/CINESTAR-5bea0d.jpg)`,
               }}
             ></div>
           }
-          key="4"
+          key="CineStar"
         ></TabPane>
       </Tabs>
+      <Tabs defaultActiveKey={tab1} type="card" tabPosition="left" onChange={handleChangeTab1}>
+        {cinemas.filter(cinema => cinema.cinemaType === tab).map((cinema) => {
+          console.log(cinema);
+          return (
+            <TabPane
+              tab={
+                <div className=" flex font-sans">
+                  <div
+                    className=" bg-cover"
+                    style={{
+                      width: 60,
+                      height: 60,
+                      backgroundImage: `url(${cinema.imgUrl})`,
+                    }}
+                  ></div>
+                  <div className="pl-5 flex-col">
+                    <div className="text-sm font-medium">
+                      {cinema.cinemaName}
+                    </div>
+                    <div className="text-sm">
+                      {cinema.cinemaAddress}
+                    </div>
+
+                  </div>
+                </div>
+              }
+              key={cinema._id}
+            >
+            </TabPane>
+          )
+        })}
+      </Tabs>
+      {/* <Tabs tabPosition="left" >
+        {showtimes.filter(showtime => showtime.cinemaName === tab1).map((showtime) => {
+          return (
+            <TabPane
+              tab={
+                <div className=" flex font-sans">
+                  <div
+                    className=" bg-cover"
+                    style={{
+                      width: 60,
+                      height: 60,
+                      backgroundImage: `url(${showtime.imgUrl})`,
+                    }}
+                  ></div>
+                  <div className="pl-5 flex-col">
+                    <div className="text-sm font-medium">
+                      {showtime.title}
+                    </div>
+                    <div className="text-sm">
+                      {showtime.movieDuration}
+                    </div>
+
+                  </div>
+                </div>
+              }
+              key="{cinema.cinemaName}"
+            >
+            </TabPane>
+          )
+        })}
+      </Tabs> */}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, DatePicker, Radio, Button, Select, message,RangePicker } from "antd";
+import { Form, Input, DatePicker, Radio, Button, Select, message, RangePicker } from "antd";
 import moment from 'moment';
 
 import apiService from "../../../utils/api/apiService";
@@ -99,13 +99,21 @@ const AdminShowtimeAdd = () => {
           </Select>
         </Form.Item>
         <Form.Item
+          label="Giá"
+          name="price"
+          rules={[{ required: true, message: "Giá không được để trống!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           label="Ngày công chiếu"
           name="startDate"
           rules={[
             { required: true, message: "Ngày công chiếu không được để trống!" },
           ]}
         >
-          <DatePicker placeholder="Chọn ngày" format="DD/MM/YYYY" />
+          <DatePicker placeholder="Chọn ngày" format="DD/MM/YYYY HH:mm" showTime={{ format: 'HH:mm' }}
+          />
         </Form.Item>
         <Form.Item
           label="Ngày ngừng chiếu"
@@ -117,9 +125,10 @@ const AdminShowtimeAdd = () => {
             },
           ]}
         >
-          <DatePicker placeholder="Chọn ngày" format="DD/MM/YYYY" />
+          <DatePicker placeholder="Chọn ngày" format="DD/MM/YYYY HH:mm" showTime={{ format: 'HH:mm' }}
+          />
         </Form.Item>
-       
+
         <Form.Item className="text-center">
           <Button type="primary" htmlType="submit">
             Thêm suất chiếu

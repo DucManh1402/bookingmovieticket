@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import Router from 'next/router'
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message,InputNumber } from 'antd';
 import { useRecoilState } from 'recoil';
 
 import DefaultLayout from '../../layouts/Default'
@@ -83,18 +83,19 @@ export default function Register() {
                 </Form.Item>
 
                 <Form.Item
-                    label="Tuổi tác"
-                    name="age"
-                    rules={[
-                        {
-                            required: true,
-                            message: 'Tuổi trong khoảng 1-99!',
-                            min:1,max:2,
-                        },
-                    ]}
-                >
-                    <Input type="number"/>
-                </Form.Item>
+                        label="Tuổi tác"
+                        name="age"
+                        rules={[
+                            {
+                                type: "number",
+                                required: true,
+                                message: 'Tuổi trong khoảng 1-99!',
+                                min: 1, max: 99,
+                            },
+                        ]}
+                    >
+                        <InputNumber />
+                    </Form.Item>
 
                 <Form.Item
                     label="Số điện thoại"

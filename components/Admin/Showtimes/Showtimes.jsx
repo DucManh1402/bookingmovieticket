@@ -13,26 +13,39 @@ export default function AdminShowtimes() {
     const [showModal, setShowModal] = useState(false);
     const [showtimeDetail, setShowtimeDetails] = useState({});
 
+    const key = 'fetching';
+
     const getShowtimes = async () => {
         try {
             setLoading(true);
             const response = await apiService.get('/showtimes');
-            const responseCinemas = await apiService.get('/cinemas/getAllCinemas');
-            const responseMovies = await apiService.get('/movies/getallmovie');
-            const responseRooms = await apiService.get('/rooms');
 
             const showtimesData = response.data.map((showtime) => {
-                const cinema = responseCinemas.data.find(cinema => showtime.cinemas === cinema._id);
-                const movie = responseMovies.data.find(movie => showtime.movies === movie._id);
-                const room = responseRooms.data.find(room => showtime.rooms === room._id);
-                return { ...cinema, ...movie, ...room, ...showtime };
+                return {
+                    ...showtime.cinemas[0], ...showtime.movies[0], ...showtime.rooms[0], ...showtime,
+                    cinemas: showtime.cinemas[0]?._id, movies: showtime.movies[0]?._id, rooms: showtime.rooms[0]?._id,
+                };
             })
-            setShowtimes(showtimesData);
             console.log(showtimesData);
-
+            setShowtimes(showtimesData);
             setLoading(false);
         } catch (error) {
             console.log(error);
+        }
+    }
+
+    const updateShowtime = async (id, values, type = 'update') => {
+        try {
+            message.loading({ content: "Đang cập nhật", key })
+            if (type === 'delete') {
+                await apiService.delete(`/showtimes/${id}`);
+            } else {
+                await apiService.put(`/showtimes/${id}`, values);
+            }
+            getShowtimes();
+            message.success({ content: "Cập nhật thành công", key });
+        } catch (error) {
+            message.error({ content: "Có lỗi xảy ra", key });
         }
     }
 
@@ -62,42 +75,35 @@ export default function AdminShowtimes() {
             key: 'price',
             render: price => <span>{numberFormat(price)} đồng</span>,
         },
-
+        {
+            title: 'Ngày bắt đầu',
+            dataIndex: 'startDate',
+            key: 'startDate',
+            render: date => <span>{moment(date).format("HH:mm DD-MM-YYYY")}</span>,
+        },
+        {
+            title: 'Ngày kết thúc',
+            dataIndex: 'endDate',
+            key: 'endDate',
+            render: date => <span>{moment(date).format("HH:mm DD-MM-YYYY")}</span>,
+        },
         {
             title: 'Trạng thái',
             key: 'seats',
             dataIndex: 'seats',
-            render: seats => {
+            render: (seats, record) => {
                 const bookedSeats = seats.filter(seat => seat.status);
                 return (
                     <>
                         <Tag color={(bookedSeats.length - seats.length) === 0 ? 'volcano' : 'green'}>
                             {bookedSeats.length}/{seats.length}
                         </Tag>
+                        <Tag color={record.status ? 'green' : 'volcano'}>
+                            {record.status ? "Hoạt động" : "Tạm ngừng"}
+                        </Tag>
                     </>
                 )
             },
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (text, record) => (
-                <Space size="middle">
-                    {/* <a>Invite {record.name}</a> */}
-                    <Popconfirm
-                        title={record.status ? `Suất chiếu "${record.title}" ở phòng "${record.nameRoom}" rạp "${record.cinemaName}" sẽ tạm ngừng?`
-                            : `Suất chiếu "${record.title}" sẽ được hoạt động?`}
-                        onConfirm={() => updateStatusUser(record._id, !record.status)}
-                        okText={record.status ? "Tạm dừng" : "Hoạt động"}
-                        cancelText="Hủy"
-                    >
-                        <a className={classNames('', {
-                            "hover:text-red-400": record.status,
-                            "hover:text-green-400": !record.status
-                        })}>{record.status ? 'Tạm dừng' : "Hoạt động"}</a>
-                    </Popconfirm>
-                </Space>
-            ),
         },
     ];
 
@@ -120,7 +126,7 @@ export default function AdminShowtimes() {
                 columns={columns} dataSource={showtimes}
                 pagination={{ defaultPageSize: 6 }}
                 scroll={{ y: 500 }} />
-                 <AdminShowtimeEdit showModal={showModal} setShowModal={setShowModal} showtimeDetail={showtimeDetail}  />
+            <AdminShowtimeEdit showModal={showModal} setShowModal={setShowModal} showtimeDetail={showtimeDetail} updateShowtime={updateShowtime} />
         </div>
     )
 }

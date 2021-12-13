@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import classNames from 'classnames';
 import moment from 'moment';
-import { Table, Tag, Space, Popconfirm, message } from 'antd';
+import { Table, Tag, Space, Popconfirm, message, Row } from 'antd';
 import { DeleteOutlined } from "@ant-design/icons";
 
 import apiService from '../../../utils/api/apiService';
@@ -27,11 +27,14 @@ export default function AdminRooms() {
         }
     }
 
-    const updateRooms = async (id, values) => {
-        console.log(values);
+    const updateRooms = async (id, values, type = 'update') => {
         try {
             message.loading({ content: "Đang cập nhật", key })
-            await apiService.put(`/rooms/${id}`, values);
+            if (type === 'delete') {
+                await apiService.delete(`/rooms/${id}`);
+            } else {
+                await apiService.put(`/rooms/${id}`, values);
+            }
             getRooms();
             message.success({ content: "Cập nhật thành công", key });
             setShowModal(false);
@@ -40,13 +43,23 @@ export default function AdminRooms() {
         }
     }
 
+    const updateRoomStatus = async (room, status) => {
+        updateRooms(room._id, { ...room, status }, !status ? 'delete' : 'update');
+    }
+
 
     const columns = [
         {
             title: 'Tên phòng',
             dataIndex: 'nameRoom',
             key: 'nameRoom',
-            // render: text => <a>{text}</a>,
+            render: (text, record) => <a className="flex items-center cursor-pointer hover:underline"
+                onClick={() => {
+                    setShowModal(true)
+                    setRoomDetails(record)
+                }}
+            >
+                {text}</a>,
         },
         {
             title: 'Loại',
@@ -71,7 +84,28 @@ export default function AdminRooms() {
             dataIndex: 'cinemaName',
             key: 'cinemaName',
             // render: text => <a>{text}</a>,
-        }
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (text, record) => (
+                <Space size="middle">
+                    {/* <a>Invite {record.name}</a> */}
+                    <Popconfirm
+                        title={record.status ? `Phòng "${record.nameRoom}" sẽ dừng hoạt động?`
+                            : `Phòng "${record.nameRoom}" sẽ được mở hoạt động?`}
+                        onConfirm={() => updateRoomStatus(record, !record.status)}
+                        okText={record.status ? "Dừng hoạt động" : "Mở hoạt động"}
+                        cancelText="Hủy"
+                    >
+                        <a className={classNames('', {
+                            "hover:text-red-400": record.status,
+                            "hover:text-green-400": !record.status
+                        })}>{record.status ? 'Dừng hoạt động' : "Mở hoạt động"}</a>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
     ];
 
     useEffect(() => {
@@ -80,15 +114,6 @@ export default function AdminRooms() {
     return (
         <div>
             <Table
-                onRow={(record, rowIndex) => {
-                    return {
-                        onClick: () => {
-                            setShowModal(true)
-                            setRoomDetails(record)
-                        }
-                    }
-                }
-                }
                 columns={columns} dataSource={rooms}
                 pagination={{ defaultPageSize: 6 }}
                 scroll={{ y: 500 }} />

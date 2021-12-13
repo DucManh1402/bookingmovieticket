@@ -5,7 +5,8 @@ import {
     GlobalOutlined,
     UserOutlined,
     ScheduleOutlined,
-    VideoCameraOutlined
+    VideoCameraOutlined,
+    SolutionOutlined
 } from '@ant-design/icons';
 import AdminUser from '../components/Admin/User/User';
 import AdminMovies from '../components/Admin/Movies/Movies';
@@ -16,6 +17,7 @@ import AdminRoomAdd from '../components/Admin/Rooms/Add';
 import AdminCinemaAdd from '../components/Admin/Cinemas/Add';
 import AdminShowtimes from '../components/Admin/Showtimes/Showtimes';
 import AdminShowtimeAdd from '../components/Admin/Showtimes/Add';
+import AdminBills from '../components/Admin/Bills/Bills';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -36,6 +38,9 @@ export default function AdminLayout() {
                 <Menu onClick={({ key: tab }) => setTab(tab)} theme="dark" defaultSelectedKeys={['user']} mode="inline">
                     <Menu.Item key="user" icon={<UserOutlined />}>
                         Quản lý người dùng
+                    </Menu.Item>
+                    <Menu.Item key="bills" icon={<SolutionOutlined />}>
+                        Quản lý hóa đơn
                     </Menu.Item>
                     <SubMenu key="movies-management" icon={<DesktopOutlined />} title="Quản lý phim">
                         <Menu.Item key="movies">Danh sách phim</Menu.Item>
@@ -68,6 +73,7 @@ export default function AdminLayout() {
                         {tab === 'add-room' && <AdminRoomAdd />}
                         {tab === 'showtimes' && <AdminShowtimes />}
                         {tab === 'add-showtime' && <AdminShowtimeAdd />}
+                        {tab === 'bills' && <AdminBills />}
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>©Trang quản trị của project Movies</Footer>

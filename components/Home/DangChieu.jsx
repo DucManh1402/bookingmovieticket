@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
-import { Card, Button } from "antd";
+import { Card, Button,message } from "antd";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import TrailerModal from "./Trailer";
@@ -9,6 +9,7 @@ import Router from 'next/router';
 import { PlayCircleOutlined } from "@ant-design/icons";
 import { useRecoilState } from "recoil";
 import { movieState } from "../../store/movieState";
+import { userState } from "../../store/userState";
 
 const { Meta } = Card;
 
@@ -25,13 +26,35 @@ export default function DangChieu({ movies }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [trailer, setTrailer] = useState('');
   const [movieDetail, setMovieDetail] = useRecoilState(movieState)
+  const [user, setUser] = useRecoilState(userState);
+  const [isLogin, setIsLogin] = useState(false);
 
+  useEffect(() => {
+    if (user._id) {
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
+    }
+  }, [user])
   const handleRedirect = (movie) => {
     setMovieDetail(movie);
     localStorage.setItem('movieDetail', JSON.stringify(movie));
+    localStorage.setItem('dangChieu', JSON.stringify(true));
     Router.push('/moviedetail');
   }
 
+  const handleRedirectBook = (movie) => {
+    if(isLogin)
+    {
+      setMovieDetail(movie);
+      localStorage.setItem('movieDetail', JSON.stringify(movie));
+      Router.push('/bookticket')
+    }
+      else{
+        message.error({ content: "Đăng nhập tài khoản để mua vé"})
+      }
+    
+  }
 
   const handleShowTrailer = (event, trailer) => {
     event.stopPropagation();
@@ -79,14 +102,14 @@ export default function DangChieu({ movies }) {
                 className="group mb-12"
                 hoverable
                 style={{ width: 240, boxShadow: "none" }}
-                onClick={() => handleRedirect(movie)}
+                
                 cover={
                   <div className="relative">
                     <div className="w-full bg-cover" style={{ height: 340, backgroundImage: `url(${movie.movieImg})` }}>
 
                     </div>
 
-                    <div className="bg-gray-700 absolute opacity-70 top-0 w-full h-full z-20 hidden group-hover:flex justify-center items-center">
+                    <div onClick={() => handleRedirect(movie)} className="bg-gray-700 absolute opacity-70 top-0 w-full h-full z-20 hidden group-hover:flex justify-center items-center">
                       <div className="text-white cursor-pointer text-xl hover:text-yellow-400"
                         onClick={(event) => handleShowTrailer(event, movie.trailerUrl)}
                       ><PlayCircleOutlined style={{ fontSize: 40 }} /></div>
@@ -95,7 +118,7 @@ export default function DangChieu({ movies }) {
                   </div>
                 }
               >
-                <Button className="bg-red-500 absolute  bottom-3 left-0 w-full h-1/6 z-20 hidden group-hover:flex justify-center items-center rounded-b-2xl text-xl text-white   hover:border-red-500 border-4 border-red-500  hover:text-red-500">
+                <Button onClick={() => handleRedirectBook(movie)} className="bg-red-500 absolute  bottom-3 left-0 w-full h-1/6 z-20 hidden group-hover:flex justify-center items-center rounded-b-2xl text-xl text-white   hover:border-red-500 border-4 border-red-500  hover:text-red-500">
                   Mua vé
                 </Button>
                 <Meta title={movie.title} description={`${movie.movieDuration} phút`} />
